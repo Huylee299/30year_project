@@ -4,7 +4,6 @@ from django.http.response import JsonResponse, HttpResponse
 from .models import MISAMusic
 from .serializers import MISAMusicSerializer
 from ytmusicapi import YTMusic
-from .ultis import change_file_name
 
 # Create your views here.
 
@@ -43,6 +42,19 @@ def register_song(request):
 def get_songs(request):
     ytmusic = YTMusic("browser.json")
     musics = ytmusic.get_library_upload_songs()
+    res = ytmusic.add_playlist_items("PLw-h3C8qbmkzW6nvnzqhItNRgOizR9NBO",
+                                      ["V12Jp_LUCes"], duplicates=True)
+    
+    print(res)
+    # musics = ytmusic.get_library_playlists()
     return HttpResponse(musics)
+
+
+def add_playlist():
+    ytmusic = YTMusic("browser.json")
+    temp = ytmusic.add_playlist_items("PLw-h3C8qbmkzW6nvnzqhItNRgOizR9NBO",
+                                      ["V12Jp_LUCes"])
+    print(temp)
+    return ""
 
 
