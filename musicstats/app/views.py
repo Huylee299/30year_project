@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from rest_framework.decorators import api_view
 from django.http.response import JsonResponse, HttpResponse
 from .models import MISAMusic
 from .serializers import MISAMusicSerializer
 from ytmusicapi import YTMusic
+from .ultis import change_file_name
 
 # Create your views here.
 
@@ -13,9 +14,10 @@ def register_song(request):
         ytmusic = YTMusic("browser.json")
         request_data = request.data
         if 'file' in request_data: 
-            file = request_data['file']
-            response = ytmusic.upload_song(file.temporary_file_path())
-            if isinstance(response, str):
+            file_audio = request_data['file']
+            file_audio_path = file_audio.temporary_file_path()
+            response = ytmusic.upload_song(file_audio_path)
+            if isinstance(response, str) and response == 'STATUS_SUCCEEDED':
                 misa_music = MISAMusic(
                     full_name = request_data['full_name'],
                     phone_number = request_data['phone_number'],
@@ -25,7 +27,8 @@ def register_song(request):
                     address = request_data['address'],
                     song_title = request_data['song_title'],
                     song_lyric = request_data['song_lyric'],
-                    song_id = request_data['song_id'],
+                    song_path = file_audio_path,
+                    file_signature = request_data['file_signature'],
                     dob = request_data['dob'],
                 )
                 misa_music.save()
@@ -41,4 +44,5 @@ def get_songs(request):
     ytmusic = YTMusic("browser.json")
     musics = ytmusic.get_library_upload_songs()
     return HttpResponse(musics)
+
 
